@@ -198,9 +198,55 @@ textarea:focus,input[type=text]:focus{border-color:var(--gold);}
 /* TOAST */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1208;color:var(--parchment);padding:9px 20px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.07em;opacity:0;transition:all 0.25s;pointer-events:none;z-index:500;white-space:nowrap;border:1px solid var(--gold);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* PIN OVERLAY */
+.pin-overlay{position:fixed;inset:0;z-index:900;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:rgba(10,6,2,0.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.pin-overlay.dismissed{display:none;}
+.pin-overlay-title{font-size:26px;color:var(--parchment);text-align:center;margin-bottom:4px;}
+.pin-overlay-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:0.2em;margin-bottom:32px;text-align:center;}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:24px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(247,242,233,0.25);transition:all 0.12s;}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold);transform:scale(1.1);}
+.pin-dot.error{background:#c03030;border-color:#c03030;animation:shake 0.4s ease;}
+.pin-dot.success{background:var(--green-light);border-color:var(--green-light);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;}
+.pin-key{background:rgba(247,242,233,0.07);border:1px solid rgba(247,242,233,0.1);border-radius:12px;padding:17px 8px;font-size:22px;color:var(--parchment);font-family:'DM Mono',monospace;cursor:pointer;text-align:center;transition:background 0.08s,transform 0.08s;touch-action:manipulation;}
+.pin-key:active{background:rgba(247,242,233,0.2);transform:scale(0.92);}
+.pin-key.del{font-size:18px;color:rgba(247,242,233,0.4);}
+.pin-key.spacer{visibility:hidden;pointer-events:none;}
+.pin-error-msg{font-family:'DM Mono',monospace;font-size:11px;color:#c03030;text-align:center;margin-top:14px;min-height:16px;letter-spacing:0.06em;}
 </style>
 </head>
 <body>
+
+<!-- ══════ PIN OVERLAY ══════ -->
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-overlay-title">House Rules</div>
+  <div class="pin-overlay-sub">HOUSEHOLD ACCESS · ENTER PIN</div>
+  <div id="overlay-violations" style="display:flex;gap:14px;justify-content:center;align-items:center;margin-bottom:24px;min-height:44px;"></div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="od0"></div>
+    <div class="pin-dot" id="od1"></div>
+    <div class="pin-dot" id="od2"></div>
+    <div class="pin-dot" id="od3"></div>
+  </div>
+  <div class="pin-pad">
+    <div class="pin-key" onclick="overlayPinKey('1')">1</div>
+    <div class="pin-key" onclick="overlayPinKey('2')">2</div>
+    <div class="pin-key" onclick="overlayPinKey('3')">3</div>
+    <div class="pin-key" onclick="overlayPinKey('4')">4</div>
+    <div class="pin-key" onclick="overlayPinKey('5')">5</div>
+    <div class="pin-key" onclick="overlayPinKey('6')">6</div>
+    <div class="pin-key" onclick="overlayPinKey('7')">7</div>
+    <div class="pin-key" onclick="overlayPinKey('8')">8</div>
+    <div class="pin-key" onclick="overlayPinKey('9')">9</div>
+    <div class="pin-key spacer"></div>
+    <div class="pin-key" onclick="overlayPinKey('0')">0</div>
+    <div class="pin-key del" onclick="overlayPinDel()">⌫</div>
+  </div>
+  <div class="pin-error-msg" id="pin-error-msg"></div>
+</div>
 
 <!-- ══════ HEADER ══════ -->
 <div class="hdr">
@@ -353,19 +399,19 @@ const MEMBERS = {
 };
 
 const VIOLATIONS = [
-  { code:'§0',  name:'Other',                            note:'Specify below — required', other:true },
-  { code:'§1',  name:'Dereliction of Duties',          note:'Chores, not doing what you have to do first — specify' },
-  { code:'§2',  name:'Conduct Unbecoming',              note:'Mean behavior, name calling' },
-  { code:'§3',  name:'Disproportionate Response',       note:'Overreaction' },
-  { code:'§4',  name:'Willful Unresponsiveness',        note:'No answer, no response, without reason' },
-  { code:'§5',  name:'Material Misrepresentation',      note:'Lying' },
-  { code:'§6',  name:'Contemptuous Conduct',            note:'Eye rolls, door slams, passive aggression' },
-  { code:'§7',  name:'Selective Hearing',               note:'Claims not to have been told' },
-  { code:'§8',  name:'Left a Mess / Clean Your Room',   note:'Specify location in statement' },
-  { code:'§9',  name:'Chronic Lateness',                note:'Being late, ignoring alarm, making people wait' },
-  { code:'§10', name:'Device Misconduct',               note:'Phone at table, device roughness, unauthorized access' },
-  { code:'§11', name:'Irresponsibility / Blaming Others',note:'Blaming others, making excuses' },
-  { code:'§12', name:'Insufficient Affection',          note:'No cuddles, no acknowledgment' },
+  { code:'§0',  name:'Other',                              note:'Specify below — required', other:true },
+  { code:'§1',  name:'Dereliction of Duties',              note:'Chores not done. Commitments not met. Work deferred for play. Leaving your mess for others.' },
+  { code:'§2',  name:'Unacceptable Behavior',              note:'Mean or immature behavior. Name calling. Deliberate cruelty in word or action.' },
+  { code:'§3',  name:'Contemptuous Conduct',               note:'Eye rolls and sighs. Door slams. Passive aggression.' },
+  { code:'§4',  name:'Overreaction',                       note:'Unreasonable reaction. Making a mountain out of a molehill. Catastrophizing.' },
+  { code:'§5',  name:'Noncommunication',                   note:'Not answering. Not acknowledging. Zombie mode. Going silent without reason.' },
+  { code:'§6',  name:'Material Misrepresentation',         note:'Lying. Distorting the truth. Leaving out the part that matters. Gaslighting.' },
+  { code:'§7',  name:'Selective Hearing',                  note:'Claims not to have been told. Hearing only what is convenient.' },
+  { code:'§8',  name:'Hygiene Failure',                    note:'Neglect of showering, dental maintenance, grooming, laundry, upkeep of personal space.' },
+  { code:'§9',  name:'Chronic Lateness',                   note:'Being late, ignoring alarm, making people wait.' },
+  { code:'§10', name:'Device Misconduct',                  note:'Phone at table, device roughness, unauthorized access.' },
+  { code:'§11', name:'Scapegoating / Blame Shifting',      note:'Not owning your actions. Making excuses. Blaming other people or circumstances.' },
+  { code:'§12', name:'Insufficient Affection',             note:'No cuddles. No acknowledgment.' },
 ];
 
 const LUCY_VIOLATIONS = [
@@ -908,11 +954,77 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'),2600);
 }
 
+function renderOverlayViolations() {
+  const state = getState();
+  const el = document.getElementById('overlay-violations');
+  const items = Object.entries(MEMBERS)
+    .map(([id, m]) => ({
+      id, m,
+      count: state.violations.filter(v => v.accused===id && !v.addressed && !v.overturned).length
+    }))
+    .filter(x => x.count > 0);
+
+  if (!items.length) {
+    el.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(247,242,233,0.3);letter-spacing:0.1em;">NO OPEN VIOLATIONS</div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(232,160,64,0.7);letter-spacing:0.16em;margin-bottom:2px;">OPEN VIOLATIONS</div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        ${items.map(({id,m,count}) => `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;">
+            <div style="font-size:32px;line-height:1;">${m.emoji}</div>
+            <div style="position:absolute;top:-4px;right:-8px;background:#c03030;color:white;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:2px solid rgba(10,6,2,0.88);padding:0 3px;">${count}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════
+//  PIN OVERLAY
+// ══════════════════════════════════════
+const HOUSE_PIN = '0921'; // ← change PIN here
+let pinBuf = '';
+
+function overlayPinKey(digit) {
+  if (pinBuf.length >= 4) return;
+  pinBuf += digit;
+  updateOverlayDots();
+  if (pinBuf.length === 4) setTimeout(checkOverlayPin, 120);
+}
+function overlayPinDel() {
+  pinBuf = pinBuf.slice(0,-1);
+  updateOverlayDots();
+  document.getElementById('pin-error-msg').textContent = '';
+}
+function updateOverlayDots() {
+  for (let i=0;i<4;i++) {
+    document.getElementById(`od${i}`).className = 'pin-dot' + (i < pinBuf.length ? ' filled' : '');
+  }
+}
+function checkOverlayPin() {
+  if (pinBuf === HOUSE_PIN) {
+    for (let i=0;i<4;i++) document.getElementById(`od${i}`).className = 'pin-dot success';
+    setTimeout(() => document.getElementById('pin-overlay').classList.add('dismissed'), 350);
+  } else {
+    for (let i=0;i<4;i++) document.getElementById(`od${i}`).className = 'pin-dot error';
+    document.getElementById('pin-error-msg').textContent = 'INCORRECT — TRY AGAIN';
+    setTimeout(() => {
+      pinBuf = '';
+      updateOverlayDots();
+      document.getElementById('pin-error-msg').textContent = '';
+    }, 1000);
+  }
+}
+
 // ══════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════
 async function init() {
   renderBadges();
+  renderOverlayViolations();
   const remote = await loadFromSheets();
   if (remote && remote.cases) {
     const state = getState();
@@ -920,6 +1032,7 @@ async function init() {
     if (remote.nextId) state.nextId = remote.nextId;
     localStorage.setItem('houserules_v1', JSON.stringify(state));
     renderBadges();
+    renderOverlayViolations();
   }
 }
 init();
