@@ -169,7 +169,9 @@ textarea:focus,input[type=text]:focus{border-color:var(--gold);}
 .submit-btn:active{transform:scale(0.97);}
 .submit-btn.green{background:var(--green);}
 
-/* MEMBER SELECT ROW */
+/* OVERTURNED */
+.vcard.overturned{opacity:0.75;border-color:rgba(100,60,180,0.3);}
+.overturned-stamp{background:rgba(100,60,180,0.2);color:#c0a0ff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;padding:5px 14px;border-bottom:1px solid rgba(100,60,180,0.2);text-align:center;}
 .member-sel-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .msel-btn{background:rgba(247,242,233,0.04);border:1.5px solid rgba(247,242,233,0.1);border-radius:10px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all 0.12s;touch-action:manipulation;}
 .msel-btn:active{transform:scale(0.93);}
@@ -417,8 +419,10 @@ async function loadFromSheets() {
     if (d && d.cases) {
       d.cases = d.cases.map(c => ({
         ...c,
-        addressed: c.addressed === true || c.addressed === 'TRUE' || c.addressed === 'true' || c.addressed === 1,
+        addressed:  c.addressed  === true || c.addressed  === 'TRUE' || c.addressed  === 'true' || c.addressed  === 1,
+        overturned: c.overturned === true || c.overturned === 'TRUE' || c.overturned === 'true' || c.overturned === 1,
         addressedAt: c.addressedAt || null,
+        overturnedAt: c.overturnedAt || null,
       }));
     }
     return d;
@@ -442,7 +446,7 @@ function switchTab(id) {
 function renderBadges() {
   const state = getState();
   Object.keys(MEMBERS).forEach(id => {
-    const count = state.violations.filter(v => v.accused===id && !v.addressed).length;
+    const count = state.violations.filter(v => v.accused===id && !v.addressed && !v.overturned).length;
     const card = document.getElementById(`card-${id}`);
     const existing = card.querySelector('.vbadge');
     if (existing) existing.remove();
@@ -477,7 +481,7 @@ function openPerson(id) {
       </div>`;
     document.getElementById('ps-violations').innerHTML = '';
   } else {
-    const open = state.violations.filter(v => v.accused===id && !v.addressed);
+    const open = state.violations.filter(v => v.accused===id && !v.addressed && !v.overturned);
     document.getElementById('ps-sub').textContent = 'VIOLATIONS';
     document.getElementById('ps-count').textContent = open.length ? `${open.length} OPEN` : '';
     document.getElementById('ps-actions').innerHTML = `
@@ -518,12 +522,13 @@ function renderPersonViolations(id) {
     open.map(v => violationCardHTML(v, true)).join('');
 }
 
-function violationCardHTML(v, showAddress) {
+function violationCardHTML(v, showAddress, isOverturned) {
   const vdef = [...VIOLATIONS,...LUCY_VIOLATIONS].find(x=>x.code===v.violation);
   const displayName = (v.violation==='§0' && v.violationName) ? v.violationName : (vdef?.name || v.violation);
   const accused = MEMBERS[v.accused];
-  const filerName = v.filer === 'lucy' ? '🐕 Lucy' : MEMBERS[v.filer]?.name || v.filer;
-  return `<div class="vcard${v.addressed?' archived':''}">
+  const overturnedClass = v.overturned ? ' overturned' : (v.addressed ? ' archived' : '');
+  return `<div class="vcard${overturnedClass}">
+    ${v.overturned ? `<div class="overturned-stamp">🔄 OVERTURNED</div>` : ''}
     <div class="vcard-top">
       <div class="vcard-code">${v.violation}</div>
       <div class="vcard-block">
@@ -535,12 +540,13 @@ function violationCardHTML(v, showAddress) {
       <div class="vcard-meta">
         ${v.filer==='lucy'?'🐕':MEMBERS[v.filer]?.emoji||'?'} ${v.filer==='lucy'?'Lucy':MEMBERS[v.filer]?.name||'Unknown'} → ${MEMBERS[v.accused]?.emoji} ${MEMBERS[v.accused]?.name} · ${timeSince(v.filedAt)} ago
         ${v.punishment ? `<div class="vcard-punishment">⚖ ${v.punishment}</div>` : ''}
-        ${v.statement ? `<div style="font-style:italic;color:rgba(247,242,233,0.5);font-size:10px;margin-top:2px;">"${v.statement.substring(0,50)}${v.statement.length>50?'…':''}"</div>` : ''}
+        ${v.statement ? `<div style="font-style:italic;color:rgba(247,242,233,0.5);font-size:11px;margin-top:2px;">"${v.statement.substring(0,50)}${v.statement.length>50?'…':''}"</div>` : ''}
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-        ${showAddress && !v.addressed ? `<button class="btn-sm btn-address" onclick="openAddressDrawer('${v.id}')">ANSWER</button>` : ''}
+        ${showAddress && !v.addressed && !v.overturned ? `<button class="btn-sm btn-address" onclick="openAddressDrawer('${v.id}')">ANSWER</button>` : ''}
         ${!showAddress ? `<button class="btn-sm btn-view" onclick="openViewDrawer('${v.id}')">VIEW</button>` : ''}
-        ${v.addressed ? `<span class="resolved-badge">ADDRESSED</span>` : ''}
+        ${v.overturned ? `<span class="resolved-badge" style="background:rgba(100,60,180,0.15);color:#c0a0ff;border-color:rgba(100,60,180,0.3);">OVERTURNED</span>` : ''}
+        ${v.addressed && !v.overturned ? `<span class="resolved-badge">ADDRESSED</span>` : ''}
       </div>
     </div>
   </div>`;
@@ -654,6 +660,8 @@ function submitViolation() {
     addressed: false,
     filedAt: Date.now(),
     addressedAt: null,
+    overturned: false,
+    overturnedAt: null,
   });
 
   saveState(state);
@@ -727,6 +735,19 @@ function markAddressed() {
   showToast('Violation addressed.');
 }
 
+function overturnCase(id) {
+  if (!confirm('Overturn this violation? It will remain in the archive but will not count against the record.')) return;
+  const state = getState();
+  const v = state.violations.find(x=>x.id===(id||activeViolId));
+  if (!v) return;
+  v.overturned = true;
+  v.overturnedAt = Date.now();
+  saveState(state);
+  closeDrawer('view-overlay');
+  renderBadges(); renderDocket(); renderArchive(); renderStats();
+  showToast('Violation overturned.');
+}
+
 function openViewDrawer(id) {
   const state = getState();
   const v = state.violations.find(x=>x.id===id);
@@ -773,6 +794,7 @@ function openViewDrawer(id) {
     </div>
     <div style="padding:14px 18px 32px;">
       <a href="household_code.html" target="_blank" class="code-link">📜 Reference The Household Code</a>
+      ${v.overturned ? `<div style="text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:#c0a0ff;padding:10px 0;">🔄 This violation has been overturned.</div>` : ''}
     </div>`;
 
   openDrawer('view-overlay');
@@ -807,14 +829,25 @@ function renderDocket() {
 // ══════════════════════════════════════
 function renderArchive() {
   const state = getState();
-  const done = state.violations.filter(v => v.addressed)
-    .sort((a,b) => b.addressedAt - a.addressedAt);
+  const done = state.violations.filter(v => v.addressed || v.overturned)
+    .sort((a,b) => (b.addressedAt||b.overturnedAt||0) - (a.addressedAt||a.overturnedAt||0));
   const el = document.getElementById('tab-archive');
   if (!done.length) {
     el.innerHTML = `<div class="docket-empty"><div class="docket-empty-icon">🗄️</div><div class="docket-empty-text">Archive is empty.</div><div class="docket-empty-sub">ADDRESSED VIOLATIONS APPEAR HERE</div></div>`;
     return;
   }
-  el.innerHTML = done.map(v => violationCardHTML(v, false)).join('');
+  const addressed  = done.filter(v => v.addressed && !v.overturned);
+  const overturned = done.filter(v => v.overturned);
+  let html = '';
+  if (overturned.length) {
+    html += `<div class="section-label">🔄 OVERTURNED</div>`;
+    html += overturned.map(v => violationCardHTML(v, false, true)).join('');
+  }
+  if (addressed.length) {
+    html += `<div class="section-label">✓ ADDRESSED</div>`;
+    html += addressed.map(v => violationCardHTML(v, false, false)).join('');
+  }
+  el.innerHTML = html;
 }
 
 // ══════════════════════════════════════
@@ -822,7 +855,7 @@ function renderArchive() {
 // ══════════════════════════════════════
 function renderStats() {
   const state = getState();
-  const all = state.violations;
+  const all = state.violations.filter(v => !v.overturned);
   const open = all.filter(v=>!v.addressed).length;
   const addressed = all.filter(v=>v.addressed).length;
 
@@ -831,7 +864,6 @@ function renderStats() {
   all.forEach(v => { if(counts[v.accused]!==undefined) counts[v.accused]++; });
   const max = Math.max(1,...Object.values(counts));
 
-  // Week / month breakdown
   const now = Date.now();
   const week = all.filter(v => (now-v.filedAt) < 604800000).length;
   const month = all.filter(v => (now-v.filedAt) < 2592000000).length;
