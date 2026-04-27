@@ -252,7 +252,7 @@ textarea:focus{border-color:var(--gold);}
         <div class="pin-key" onclick="pinKey('0')">0</div>
         <div class="pin-key del" onclick="pinDel()">⌫</div>
       </div>
-      <button class="pin-enter" onclick="pinEnter()">ENTER</button>
+      <button class="pin-enter" onclick="pinEnter()" style="touch-action:manipulation;">ENTER</button>
       <div class="pin-error" id="pin-error"></div>
     </div>
   </div>
@@ -751,6 +751,7 @@ function openCase(id) {
   activeCaseId = id;
   const v = VIOLATIONS.find(x=>x.code===c.violation) || LUCY_VIOLATIONS.find(x=>x.code===c.violation);
   const filer=MEMBERS[c.filer], accused=MEMBERS[c.accused];
+  const canConfirm = currentUser !== c.filer && currentUser !== c.accused && currentUser !== 'lucy';
   const isAccused  = currentUser===c.accused;
   const isVictim   = currentUser===c.filer;
 
