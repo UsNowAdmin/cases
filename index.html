@@ -28,28 +28,42 @@
 body{background:var(--ink);color:var(--parchment);font-family:'IM Fell English',serif;min-height:100vh;font-size:16px;line-height:1.5;overscroll-behavior:none;}
 
 /* ── HEADER ── */
-.hdr{background:var(--ink);padding:16px 18px 12px;text-align:center;border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:100;}
-.hdr-title{font-size:22px;color:var(--parchment);}
-.hdr-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.2em;margin-top:2px;}
+.hdr{background:linear-gradient(135deg,#1a0a02 0%,#2a1208 50%,#1a0a02 100%);padding:16px 18px 12px;text-align:center;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(184,132,30,0.15);}
+.hdr-title{font-size:24px;color:var(--parchment);text-shadow:0 0 20px rgba(184,132,30,0.3);}
+.hdr-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:0.22em;margin-top:3px;}
 
 /* ── TABS ── */
-.tab-bar{display:flex;background:var(--ink);border-bottom:1px solid rgba(184,132,30,0.2);position:sticky;top:62px;z-index:90;}
-.tab-btn{flex:1;padding:10px 4px;text-align:center;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;color:rgba(247,242,233,0.35);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;touch-action:manipulation;}
-.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
-.tab-icon{font-size:16px;display:block;margin-bottom:2px;}
+.tab-bar{display:flex;background:#150d04;border-bottom:2px solid rgba(184,132,30,0.3);position:sticky;top:65px;z-index:90;}
+.tab-btn{flex:1;padding:11px 4px;text-align:center;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;color:rgba(247,242,233,0.3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;touch-action:manipulation;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(184,132,30,0.06);}
+.tab-btn:nth-child(1).active{color:#e87070;border-bottom-color:#e87070;}
+.tab-btn:nth-child(2).active{color:#70b8e8;border-bottom-color:#70b8e8;}
+.tab-btn:nth-child(3).active{color:#a0c878;border-bottom-color:#a0c878;}
+.tab-btn:nth-child(4).active{color:#e8c070;border-bottom-color:#e8c070;}
+.tab-icon{font-size:18px;display:block;margin-bottom:2px;}
 .tab-content{display:none;padding:16px 14px 100px;min-height:60vh;}
 .tab-content.active{display:block;}
 
 /* ── HOME — AVATAR GRID ── */
-.home-intro{font-family:'DM Mono',monospace;font-size:10px;color:rgba(247,242,233,0.4);text-align:center;letter-spacing:0.12em;padding:20px 0 16px;}
-.avatar-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:340px;margin:0 auto;}
-.avatar-card{background:rgba(247,242,233,0.04);border:1.5px solid rgba(247,242,233,0.1);border-radius:16px;padding:22px 12px 18px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.15s;position:relative;touch-action:manipulation;}
-.avatar-card:active{transform:scale(0.95);background:rgba(247,242,233,0.08);}
-.avatar-card.lucy{border-color:rgba(184,132,30,0.3);background:rgba(184,132,30,0.04);}
-.avatar-emoji{font-size:42px;}
-.avatar-name{font-family:'DM Mono',monospace;font-size:12px;color:var(--parchment);letter-spacing:0.08em;}
-.avatar-sub{font-family:'DM Mono',monospace;font-size:9px;color:rgba(247,242,233,0.35);letter-spacing:0.06em;}
-.vbadge{position:absolute;top:10px;right:10px;background:#c03030;color:white;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;min-width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);padding:0 4px;animation:pop 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+.home-intro{font-family:'DM Mono',monospace;font-size:10px;color:rgba(247,242,233,0.35);text-align:center;letter-spacing:0.12em;padding:18px 0 14px;}
+.avatar-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:360px;margin:0 auto;}
+.avatar-card{border-radius:18px;padding:24px 12px 18px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.15s;position:relative;touch-action:manipulation;}
+.avatar-card:active{transform:scale(0.93);}
+
+/* Individual member colors */
+.avatar-card.jon{background:linear-gradient(145deg,rgba(100,60,180,0.18) 0%,rgba(60,30,120,0.1) 100%);border:2px solid rgba(140,100,220,0.5);box-shadow:0 4px 20px rgba(100,60,180,0.2),inset 0 1px 0 rgba(180,140,255,0.1);}
+.avatar-card.jon:active{background:linear-gradient(145deg,rgba(100,60,180,0.28) 0%,rgba(60,30,120,0.2) 100%);}
+.avatar-card.jaime{background:linear-gradient(145deg,rgba(220,80,120,0.18) 0%,rgba(160,40,80,0.1) 100%);border:2px solid rgba(240,100,140,0.5);box-shadow:0 4px 20px rgba(220,80,120,0.2),inset 0 1px 0 rgba(255,160,190,0.1);}
+.avatar-card.jaime:active{background:linear-gradient(145deg,rgba(220,80,120,0.28) 0%,rgba(160,40,80,0.2) 100%);}
+.avatar-card.jacob{background:linear-gradient(145deg,rgba(40,140,220,0.18) 0%,rgba(20,80,160,0.1) 100%);border:2px solid rgba(60,160,240,0.5);box-shadow:0 4px 20px rgba(40,140,220,0.2),inset 0 1px 0 rgba(120,200,255,0.1);}
+.avatar-card.jacob:active{background:linear-gradient(145deg,rgba(40,140,220,0.28) 0%,rgba(20,80,160,0.2) 100%);}
+.avatar-card.lucy{background:linear-gradient(145deg,rgba(200,150,30,0.18) 0%,rgba(140,100,10,0.1) 100%);border:2px solid rgba(220,170,50,0.5);box-shadow:0 4px 20px rgba(200,150,30,0.2),inset 0 1px 0 rgba(255,220,100,0.1);}
+.avatar-card.lucy:active{background:linear-gradient(145deg,rgba(200,150,30,0.28) 0%,rgba(140,100,10,0.2) 100%);}
+
+.avatar-emoji{font-size:52px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4));}
+.avatar-name{font-family:'DM Mono',monospace;font-size:13px;color:var(--parchment);letter-spacing:0.1em;font-weight:700;}
+.avatar-sub{font-family:'DM Mono',monospace;font-size:8px;color:rgba(247,242,233,0.3);letter-spacing:0.06em;text-align:center;line-height:1.4;}
+.vbadge{position:absolute;top:10px;right:10px;background:#c03030;color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;min-width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:2px solid #0f0c08;padding:0 5px;animation:pop 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 2px 8px rgba(192,48,48,0.5);}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
 
 /* ── PERSON SCREEN ── */
@@ -186,25 +200,25 @@ textarea:focus,input[type=text]:focus{border-color:var(--gold);}
 <div class="tab-content active" id="tab-home">
   <div class="home-intro">TAP A MEMBER TO FILE OR ANSWER A VIOLATION</div>
   <div class="avatar-grid">
-    <div class="avatar-card" id="card-jon" onclick="openPerson('jon')">
+    <div class="avatar-card jon" id="card-jon" onclick="openPerson('jon')">
       <div class="avatar-emoji">👨‍⚖️</div>
       <div class="avatar-name">JON</div>
-      <div class="avatar-sub">TAP TO FILE OR ANSWER</div>
+      <div class="avatar-sub">TAP TO FILE<br>OR ANSWER</div>
     </div>
-    <div class="avatar-card" id="card-jaime" onclick="openPerson('jaime')">
+    <div class="avatar-card jaime" id="card-jaime" onclick="openPerson('jaime')">
       <div class="avatar-emoji">👩</div>
       <div class="avatar-name">JAIME</div>
-      <div class="avatar-sub">TAP TO FILE OR ANSWER</div>
+      <div class="avatar-sub">TAP TO FILE<br>OR ANSWER</div>
     </div>
-    <div class="avatar-card" id="card-jacob" onclick="openPerson('jacob')">
+    <div class="avatar-card jacob" id="card-jacob" onclick="openPerson('jacob')">
       <div class="avatar-emoji">🧑</div>
       <div class="avatar-name">JACOB</div>
-      <div class="avatar-sub">TAP TO FILE OR ANSWER</div>
+      <div class="avatar-sub">TAP TO FILE<br>OR ANSWER</div>
     </div>
     <div class="avatar-card lucy" id="card-lucy" onclick="openPerson('lucy')">
       <div class="avatar-emoji">🐕</div>
       <div class="avatar-name">LUCY</div>
-      <div class="avatar-sub">TAP TO FILE ON HER BEHALF</div>
+      <div class="avatar-sub">TAP TO FILE<br>ON HER BEHALF</div>
     </div>
   </div>
 </div>
@@ -246,6 +260,10 @@ textarea:focus,input[type=text]:focus{border-color:var(--gold);}
       <div class="field-group">
         <div class="field-lbl">VIOLATION <span class="field-required">*</span></div>
         <div class="viol-list" id="viol-list"></div>
+      </div>
+      <div class="field-group" id="other-name-group" style="display:none;">
+        <div class="field-lbl">VIOLATION NAME <span class="field-required">*</span></div>
+        <input type="text" id="other-name" placeholder="Describe the violation…" style="user-select:text;">
       </div>
       <div class="field-group">
         <div class="field-lbl">PUNISHMENT <span class="field-required">*</span></div>
@@ -291,6 +309,8 @@ textarea:focus,input[type=text]:focus{border-color:var(--gold);}
   </div>
 </div>
 
+<a href="household_code.html" target="_blank" style="position:fixed;bottom:22px;left:18px;width:48px;height:48px;border-radius:50%;background:#1a1208;border:1px solid rgba(184,132,30,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4);text-decoration:none;" title="The Household Code">📜</a>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -307,6 +327,7 @@ const MEMBERS = {
 };
 
 const VIOLATIONS = [
+  { code:'§0',  name:'Other',                            note:'Specify below — required', other:true },
   { code:'§1',  name:'Dereliction of Duties',          note:'Chores, not doing what you have to do first — specify' },
   { code:'§2',  name:'Conduct Unbecoming',              note:'Mean behavior, name calling' },
   { code:'§3',  name:'Disproportionate Response',       note:'Overreaction' },
@@ -466,13 +487,14 @@ function renderPersonViolations(id) {
 
 function violationCardHTML(v, showAddress) {
   const vdef = [...VIOLATIONS,...LUCY_VIOLATIONS].find(x=>x.code===v.violation);
+  const displayName = (v.violation==='§0' && v.violationName) ? v.violationName : (vdef?.name || v.violation);
   const accused = MEMBERS[v.accused];
   const filerName = v.filer === 'lucy' ? '🐕 Lucy' : MEMBERS[v.filer]?.name || v.filer;
   return `<div class="vcard${v.addressed?' archived':''}">
     <div class="vcard-top">
       <div class="vcard-code">${v.violation}</div>
       <div class="vcard-block">
-        <div class="vcard-name">${vdef?.name || v.violation}</div>
+        <div class="vcard-name">${displayName}</div>
         ${v.note ? `<div class="vcard-note">${v.note}</div>` : ''}
       </div>
     </div>
@@ -544,6 +566,9 @@ function pickViolation(code) {
   selViolation = code;
   document.querySelectorAll('.viol-item').forEach(b=>b.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
+  const isOther = code === '§0';
+  document.getElementById('other-name-group').style.display = isOther ? 'block' : 'none';
+  if (!isOther) document.getElementById('other-name').value = '';
 }
 function pickPunishment(val) {
   selPunishment = val;
@@ -553,10 +578,12 @@ function pickPunishment(val) {
 
 function submitViolation() {
   if (!selViolation) { showToast('Select a violation.'); return; }
+  if (selViolation === '§0' && !document.getElementById('other-name').value.trim()) { showToast('Enter a violation name.'); return; }
   if (!selPunishment) { showToast('Select a punishment.'); return; }
   if (isLucyFiling && !lucyAccused) { showToast('Select who neglected Lucy.'); return; }
 
   const note = document.getElementById('file-note').value.trim();
+  const otherName = selViolation === '§0' ? document.getElementById('other-name').value.trim() : '';
   const state = getState();
   const id = `VIO-${String(state.nextId).padStart(4,'0')}`;
   state.nextId++;
@@ -570,6 +597,7 @@ function submitViolation() {
     filer: isLucyFiling ? 'lucy' : 'unknown',
     accused: isLucyFiling ? lucyAccused : activePerson,
     violation: selViolation,
+    violationName: otherName || '',
     punishment,
     note: note || '',
     statement: '',
@@ -596,12 +624,13 @@ function openAddressDrawer(id) {
   const v = state.violations.find(x=>x.id===id);
   if (!v) return;
   const vdef = [...VIOLATIONS,...LUCY_VIOLATIONS].find(x=>x.code===v.violation);
+  const displayName = (v.violation==='§0' && v.violationName) ? v.violationName : (vdef?.name || v.violation);
   const filerName = v.filer==='lucy' ? '🐕 Lucy' : MEMBERS[v.filer]?.name || 'Unknown';
 
   document.getElementById('address-body').innerHTML = `
     <div class="detail-block">
       <div class="detail-lbl">VIOLATION</div>
-      <div class="detail-val">${v.violation} · ${vdef?.name}</div>
+      <div class="detail-val">${v.violation} · ${displayName}</div>
       <div class="detail-punishment">${v.punishment}</div>
     </div>
     ${v.note ? `<div class="detail-block"><div class="detail-lbl">DETAIL</div><div class="detail-quote">${v.note}</div></div>` : ''}
@@ -638,6 +667,7 @@ function openViewDrawer(id) {
   const v = state.violations.find(x=>x.id===id);
   if (!v) return;
   const vdef = [...VIOLATIONS,...LUCY_VIOLATIONS].find(x=>x.code===v.violation);
+  const displayName = (v.violation==='§0' && v.violationName) ? v.violationName : (vdef?.name || v.violation);
   const accused = MEMBERS[v.accused];
   const filerName = v.filer==='lucy' ? '🐕 Lucy' : MEMBERS[v.filer]?.name || 'Unknown';
 
@@ -649,7 +679,7 @@ function openViewDrawer(id) {
     </div>
     <div class="detail-block">
       <div class="detail-lbl">VIOLATION</div>
-      <div class="detail-val">${v.violation} · ${vdef?.name}</div>
+      <div class="detail-val">${v.violation} · ${displayName}</div>
       <div class="detail-punishment">${v.punishment}</div>
     </div>
     ${v.note ? `<div class="detail-block"><div class="detail-lbl">DETAIL</div><div class="detail-quote">${v.note}</div></div>` : ''}
