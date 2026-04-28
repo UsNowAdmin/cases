@@ -437,7 +437,13 @@ let activeViolId   = null;
 let isLucyFiling   = false;
 
 function getState() {
-  return JSON.parse(localStorage.getItem('houserules_v1') || JSON.stringify({ violations:[], nextId:1 }));
+  const s = JSON.parse(localStorage.getItem('houserules_v1') || JSON.stringify({ violations:[], nextId:1 }));
+  s.violations = s.violations.map(c => ({
+    ...c,
+    addressed:  c.addressed  === true || c.addressed  === 'TRUE' || c.addressed  === 'true'  || c.addressed  === 1,
+    overturned: c.overturned === true || c.overturned === 'TRUE' || c.overturned === 'true'  || c.overturned === 1,
+  }));
+  return s;
 }
 function saveState(s) {
   localStorage.setItem('houserules_v1', JSON.stringify(s));
@@ -557,7 +563,7 @@ function scrollToViolations() {
 
 function renderPersonViolations(id) {
   const state = getState();
-  const open = state.violations.filter(v => v.accused===id && !v.addressed)
+  const open = state.violations.filter(v => v.accused===id && !v.addressed && !v.overturned)
     .sort((a,b) => b.filedAt - a.filedAt);
   const el = document.getElementById('ps-violations');
   if (!open.length) {
@@ -776,7 +782,7 @@ function markAddressed() {
   saveState(state);
   closeDrawer('address-overlay');
   renderBadges();
-  if (activePerson) renderPersonViolations(activePerson);
+  if (activePerson) openPerson(activePerson);
   renderDocket(); renderArchive(); renderStats();
   showToast('Violation addressed.');
 }
@@ -851,7 +857,7 @@ function openViewDrawer(id) {
 // ══════════════════════════════════════
 function renderDocket() {
   const state = getState();
-  const open = state.violations.filter(v => !v.addressed)
+  const open = state.violations.filter(v => !v.addressed && !v.overturned)
     .sort((a,b) => b.filedAt - a.filedAt);
   const el = document.getElementById('tab-docket');
   if (!open.length) {
@@ -1026,7 +1032,7 @@ async function init() {
   renderBadges();
   renderOverlayViolations();
   const remote = await loadFromSheets();
-  if (remote && remote.cases) {
+  if (remote && remote.cases && remote.cases.length > 0) {
     const state = getState();
     state.violations = remote.cases;
     if (remote.nextId) state.nextId = remote.nextId;
